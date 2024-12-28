@@ -19,7 +19,7 @@ provider:
   runtime: nodejs18.x
   region: us-east-1
   environment:
-    API_TOKEN: ${env:API_TOKEN} # Fetches from .env file
+    API_TOKEN: ${env:API_TOKEN}
 
   iamRoleStatements:
     - Effect: Allow
@@ -32,8 +32,6 @@ functions:
 
   authorizer:
     handler: src/functions/authorizer.handler
-    environment:
-      API_TOKEN: ${self:provider.environment.API_TOKEN}
 
   registerMeeting:
     handler: src/functions/handler.registerMeeting
