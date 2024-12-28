@@ -1,0 +1,1 @@
+const TABLE_NAME = process.env.MEETING_TABLE_NAME || 'MeetingDetails';

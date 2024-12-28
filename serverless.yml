@@ -1,0 +1,59 @@
+service: meeting-scheduler
+
+
+#npm run deploy --param="GENERTAED_TOKEN"
+frameworkVersion: '3'
+
+plugins:
+  - serverless-esbuild
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    API_TOKEN: ${param:apiToken, 'GENERATED_TOKEN'} # node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+      Resource:
+        - arn:aws:dynamodb:${self:provider.region}:*:table/MeetingDetails
+       
+functions:
+  
+  authorizer:
+    handler: src/functions/authorizer.handler
+    environment:
+      API_TOKEN: ${self:provider.environment.API_TOKEN}
+
+  registerMeeting:
+    handler: src/functions/handler.registerMeeting
+    events:
+      - http:
+          path: schedule-meeting
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            type: token
+            identitySource: method.request.header.Authorization
+            resultTtlInSeconds: 300
+
+
+resources:
+  Resources:
+    MeetingTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: MeetingDetails
+        AttributeDefinitions:
+          - AttributeName: "meetingId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "meetingId"
+            KeyType: "HASH"
+
+        BillingMode: PAY_PER_REQUEST 
+
