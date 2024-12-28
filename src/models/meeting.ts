@@ -1,31 +1,33 @@
-import { z } from 'zod';
+import { MeetingRecord } from '../types/meeting';
 
-export const DialogflowParameterSchema = z.object({
-  any: z.string().min(1, 'Contact URL is required'),
-  connectiontype: z.string().min(1, 'Connection type is required'),
-  meeting_time: z.string().min(1, 'Meeting time is required')
-});
-
-export const DialogflowQueryResultSchema = z.object({
-  parameters: DialogflowParameterSchema,
-  queryText: z.string(),
-  languageCode: z.string()
-});
-
-export const DialogflowRequestSchema = z.object({
-  queryResult: DialogflowQueryResultSchema,
-  session: z.string(),
-  responseId: z.string()
-});
-
-export type DialogflowRequest = z.infer<typeof DialogflowRequestSchema>;
-export type MeetingInput = z.infer<typeof DialogflowParameterSchema>;
-
-export interface MeetingRecord {
+export class Meeting implements MeetingRecord {
   meetingId: string;
   contactUrl: string;
   connectionType: string;
   dateTime: string;
   createdAt: string;
   updatedAt: string;
+
+  constructor(data: Omit<MeetingRecord, 'createdAt' | 'updatedAt'>) {
+    this.meetingId = data.meetingId;
+    this.contactUrl = data.contactUrl;
+    this.connectionType = data.connectionType;
+    this.dateTime = data.dateTime;
+    this.createdAt = new Date().toISOString();
+    this.updatedAt = new Date().toISOString();
+  }
+
+  static fromDialogflowParams(params: {
+    any: string;
+    connectiontype: string;
+    meeting_time: string;
+    meetingId: string;
+  }): Meeting {
+    return new Meeting({
+      meetingId: params.meetingId,
+      contactUrl: params.any,
+      connectionType: params.connectiontype,
+      dateTime: params.meeting_time
+    });
+  }
 }
