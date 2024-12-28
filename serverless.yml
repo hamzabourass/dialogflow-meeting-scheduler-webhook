@@ -1,13 +1,13 @@
 service: meeting-scheduler
 
 
-#npm run deploy --param="apiToken=23a49ed5b3a0008b942de37b8b9bd8c00f57c436ebb8b6f6c787492ad3712d84"
+#npm run deploy --param="apiToken=API_TOKEN"
 frameworkVersion: '3'
 
 plugins:
   - serverless-esbuild
   - serverless-offline
-  - serverless-dotenv-plugin  # Add this plugin
+  - serverless-dotenv-plugin 
 
 
 provider:
@@ -15,7 +15,7 @@ provider:
   runtime: nodejs18.x
   region: us-east-1
   environment:
-    API_TOKEN: ${param:apiToken, '23a49ed5b3a0008b942de37b8b9bd8c00f57c436ebb8b6f6c787492ad3712d84'} # node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+    API_TOKEN: ${param:apiToken, 'API_TOKEN'} # To generate API_TOKEN run : node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
   iamRoleStatements:
     - Effect: Allow
       Action:
